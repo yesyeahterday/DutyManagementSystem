@@ -1,0 +1,34 @@
+<!DOCTYPE holidays SYSTEM "https://www.jollyday.org/schema/holidays.dtd">
+<holidays>
+    <config description="China Public Holidays" hierarchy="china"/>
+
+    <!-- 元旦 -->
+    <holiday>
+        <fixed month="JANUARY" day="1" description="New Year's Day"/>
+    </holiday>
+
+    <!-- 春节（这里固定为 2 月 10 号，实际需要调整）-->
+    <holiday>
+        <fixed month="FEBRUARY" day="10" description="Chinese New Year"/>
+    </holiday>
+
+    <!-- 劳动节 -->
+    <holiday>
+        <fixed month="MAY" day="1" description="Labour Day"/>
+        <fixed month="MAY" day="2" description="Labour Day"/>
+        <fixed month="MAY" day="3" description="Labour Day"/>
+        <fixed month="MAY" day="4" description="Labour Day"/>
+        <fixed month="MAY" day="5" description="Labour Day"/>
+    </holiday>
+
+    <!-- 国庆节 -->
+    <holiday>
+        <fixed month="OCTOBER" day="1" description="National Day"/>
+        <fixed month="OCTOBER" day="2" description="National Day"/>
+        <fixed month="OCTOBER" day="3" description="National Day"/>
+        <fixed month="OCTOBER" day="4" description="National Day"/>
+        <fixed month="OCTOBER" day="5" description="National Day"/>
+        <fixed month="OCTOBER" day="6" description="National Day"/>
+        <fixed month="OCTOBER" day="7" description="National Day"/>
+    </holiday>
+</holidays>

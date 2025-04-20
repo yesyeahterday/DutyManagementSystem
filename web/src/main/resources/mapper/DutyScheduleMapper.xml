@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luke.mapper.DutyScheduleMapper">
+
+    <resultMap id="BaseResultMap" type="com.luke.entity.DutySchedule">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="buildingId" column="building_id" jdbcType="BIGINT"/>
+            <result property="zone" column="zone" jdbcType="VARCHAR"/>
+            <result property="dutyDate" column="duty_date" jdbcType="DATE"/>
+            <result property="salaryRatio" column="salary_ratio" jdbcType="DECIMAL"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="status" column="status" jdbcType="TINYINT"/>
+            <result property="version" column="version" jdbcType="INTEGER"/>
+            <result property="historyFlag" column="history_flag" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <!-- 结果映射，将查询结果映射为 ScheduleVo -->
+    <resultMap id="scheduleVoResultMap" type="com.luke.vo.ScheduleVo">
+        <result property="name" column="building_name" />
+        <result property="date" column="duty_date" javaType="java.time.LocalDate" />
+        <result property="status" column="status" />
+        <result property="username" column="username" />
+        <result property="realname" column="real_name" />
+        <result property="gender_type" column="gender_type" />
+    </resultMap>
+
+    <resultMap id="leaveScheduleVoResultMap" type="com.luke.vo.reassign.LeaveScheduleVo">
+        <result property="scheduleId" column = "id"/>
+        <result property="name" column = "name"/>
+        <result property="date" column="duty_date" javaType="java.time.LocalDate"/>
+        <result property="gender_type" column="gender_type"/>
+        <result property="salary_ratio" column="salary_ratio"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,building_id,zone,duty_date,
+        salary_ratio,user_id,status,
+        version,history_flag
+    </sql>
+
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO duty_schedule (building_id,zone, duty_date, salary_ratio, user_id, status, version, history_flag, is_deleted)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.buildingId},#{item.zone}, #{item.dutyDate}, #{item.salaryRatio}, #{item.userId}, #{item.status}, #{item.version}, #{item.historyFlag}, #{item.isDeleted})
+        </foreach>
+    </insert>
+
+    <select id="selectDistinctDates" resultType="java.time.LocalDate">
+        SELECT DISTINCT duty_date
+        FROM duty_schedule
+        WHERE zone = #{zone}
+          AND duty_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- 多表查询：查询DutySchedule、Dorm和User的相关信息 -->
+    <select id="selectUnAssignedSchedules" resultMap="scheduleVoResultMap">
+        SELECT
+        d.name AS building_name,
+        ds.duty_date,
+        ds.status,
+        u.username,
+        u.real_name,
+        d.gender_type
+        FROM duty_schedule ds
+        LEFT JOIN dorm d ON ds.building_id = d.id
+        LEFT JOIN user u ON ds.user_id = u.id
+        WHERE ds.status = #{status}
+        AND ds.duty_date BETWEEN #{startDate} AND #{endDate}
+        AND ds.building_id IN
+        <foreach collection="buildingIds" item="buildingId" open="(" close=")" separator=",">
+            #{buildingId}
+        </foreach>
+    </select>
+    <select id="selectAllSchedules" resultMap="scheduleVoResultMap">
+        SELECT
+        d.name ,
+        ds.duty_date,
+        ds.status,
+        u.username,
+        u.real_name,
+        d.gender_type
+        FROM duty_schedule ds
+        LEFT JOIN dorm d ON ds.building_id = d.id
+        LEFT JOIN user u ON ds.user_id = u.id
+        AND ds.duty_date BETWEEN #{parse} AND #{parse1}
+        AND ds.building_id IN
+        <foreach collection="buildingIds" item="buildingId" open="(" close=")" separator=",">
+            #{buildingId}
+        </foreach>
+    </select>
+
+    <select id="findByUserIdAndDate" resultType = "com.luke.entity.DutySchedule">
+        SELECT *
+        FROM duty_schedule AS ds
+        WHERE ds.user_id = #{userId}
+                AND ds.duty_date = #{date}
+    </select>
+
+    <select id="findLeavesByDateRange" resultMap="leaveScheduleVoResultMap">
+        SELECT
+            ds.id,
+            d.name,
+            ds.duty_date,
+            ds.salary_ratio,
+            d.gender_type
+        FROM duty_schedule AS ds
+        LEFT JOIN dorm d ON ds.building_id = d.id
+        WHERE ds.duty_date BETWEEN #{startDate} AND #{endDate}
+        AND ds.status = 1
+        AND ds.is_deleted = 0
+    </select>
+
+    <!--根据userId查询自己的正常排班记录-->
+    <select id="findByUserIdAndDateRange" resultMap="scheduleVoResultMap">
+        SELECT
+        d.name as building_name,
+        ds.duty_date,
+        ds.status,
+        u.username,
+        u.real_name,
+        d.gender_type
+        FROM duty_schedule ds
+        LEFT JOIN dorm d ON ds.building_id = d.id
+        LEFT JOIN user u ON ds.user_id = u.id
+        WHERE ds.duty_date BETWEEN #{startDate} AND #{endDate}
+        AND ds.user_id = #{userId}
+        AND ds.status = 0
+        AND ds.is_deleted = 0
+    </select>
+
+    <select id="findLeaveByUserIdAndDateRange" resultMap="scheduleVoResultMap">
+        SELECT
+            d.name as building_name,
+            ds.duty_date,
+            ds.status,
+            u.username,
+            u.real_name,
+            d.gender_type
+        FROM duty_schedule ds
+                 LEFT JOIN dorm d ON ds.building_id = d.id
+                 LEFT JOIN user u ON ds.user_id = u.id
+        WHERE ds.duty_date BETWEEN #{startDate} AND #{endDate}
+          AND ds.user_id = #{userId}
+          AND ds.status = 1
+          AND ds.is_deleted = 0
+    </select>
+</mapper>

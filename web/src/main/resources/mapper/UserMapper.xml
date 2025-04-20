@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luke.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.luke.entity.User">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+            <result property="gender" column="gender" jdbcType="OTHER"/>
+            <result property="grade" column="grade" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="dorm" column="dorm" jdbcType="BIGINT"/>
+            <result property="dormNumber" column="dorm_number" jdbcType="VARCHAR"/>
+            <result property="position" column="position" jdbcType="VARCHAR"/>
+            <result property="managedZone" column="managed_zone" jdbcType="VARCHAR"/>
+            <result property="isActive" column="is_active" jdbcType="TINYINT"/>
+            <result property="emailAddress" column="email_address" jdbcType="VARCHAR"/>
+            <result property="role" column="role" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,username,password,
+        realName,gender,grade,
+        phone,dorm,dormNumber,
+        position,managedZone,isActive,role
+    </sql>
+    <select id="selectUserByZone" resultType="com.luke.entity.User">
+        SELECT * FROM user
+        WHERE managed_zone = #{zone}
+        ORDER BY id DESC;
+    </select>
+
+    <select id="findUserIdByUsername" resultType="java.lang.Long">
+        SELECT id from user
+        WHERE username = #{username}
+    </select>
+</mapper>

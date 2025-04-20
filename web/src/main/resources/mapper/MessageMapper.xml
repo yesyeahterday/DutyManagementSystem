@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luke.mapper.MessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.luke.entity.Message">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="user_id" column="user_id" jdbcType="BIGINT"/>
+            <result property="content" column="content" jdbcType="VARCHAR"/>
+            <result property="msg_type" column="msg_type" jdbcType="VARCHAR"/>
+            <result property="send_status" column="send_status" jdbcType="VARCHAR"/>
+            <result property="create_time" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,content,
+        msg_type,send_status,create_time
+    </sql>
+</mapper>

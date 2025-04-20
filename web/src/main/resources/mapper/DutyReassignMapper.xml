@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.luke.mapper.DutyReassignMapper">
+
+    <resultMap id="BaseResultMap" type="com.luke.entity.DutyReassign">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="originalScheduleId" column="original_schedule_id" jdbcType="BIGINT"/>
+            <result property="newUserId" column="new_user_id" jdbcType="BIGINT"/>
+            <result property="reassignTime" column="reassign_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,original_schedule_id,new_user_id,
+        reassign_time
+    </sql>
+
+    <!--获取替班记录-->
+    <select id="getReassignedScheduleByUserIdAndDate" resultType="com.luke.vo.ScheduleVo">
+        SELECT
+            b.name,
+            ds.duty_date AS date,
+            ds.status,
+            u.username,
+            u.real_name,
+            b.gender_type
+        FROM duty_reassign dr
+        JOIN duty_schedule ds ON dr.original_schedule_id = ds.id
+        JOIN dorm b ON ds.building_id = b.id
+        JOIN user u ON dr.new_user_id = u.id
+        WHERE dr.new_user_id = #{userId}
+        AND ds.duty_date BETWEEN #{startDate} AND #{endDate}
+        AND dr.is_deleted = 0
+        AND ds.is_deleted = 0
+    </select>
+    <select id="getScheduleIdByUserId" resultType="java.lang.Long">
+        SELECT original_schedule_id
+        from duty_reassign
+        where new_user_id = #{userId}
+                AND is_deleted =  0
+    </select>
+</mapper>
