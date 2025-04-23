@@ -57,6 +57,7 @@ public class DutySchedule implements Serializable {
      * 乐观锁版本
      */
     @TableField(value = "version")
+    @Version
     private Integer version;
 
     /**

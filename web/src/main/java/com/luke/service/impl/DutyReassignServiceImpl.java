@@ -95,14 +95,19 @@ public class DutyReassignServiceImpl extends ServiceImpl<DutyReassignMapper, Dut
             if(curDuty != null && curDuty.getDutyDate() == dutySchedule.getDutyDate()) return Result.fail("该日已经在其他楼栋有替班");
 
         }
+        //修改排班记录为替班状态
+        dutySchedule.setStatus(2);
+        boolean updated = (dutyScheduleMapper.updateById(dutySchedule) == 1);
+        if(!updated){
+            return Result.fail("该替班已经被接取，请刷新页面");
+        }
         // 生成替班记录
         DutyReassign dutyReassign = new DutyReassign();
         dutyReassign.setOriginalScheduleId(scheduleId);
         dutyReassign.setNewUserId(userId);
         dutyReassign.setReassignTime(new Date());
         dutyReassignMapper.insert(dutyReassign);
-        dutySchedule.setStatus(2);
-        dutyScheduleMapper.updateById(dutySchedule);
+
         return Result.ok("替班成功");
     }
 
@@ -178,7 +183,10 @@ public class DutyReassignServiceImpl extends ServiceImpl<DutyReassignMapper, Dut
         }
 
         dutySchedule.setStatus(0);
-        dutyScheduleMapper.updateById(dutySchedule);
+        boolean updated = (dutyScheduleMapper.updateById(dutySchedule) == 1);
+        if(!updated) {
+            return Result.fail("该班次已被替班，请刷新页面");
+        }
         return Result.ok();
     }
 }
